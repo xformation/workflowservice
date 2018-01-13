@@ -3,8 +3,6 @@
  */
 package com.synectiks.state.machine.utils;
 
-import org.springframework.statemachine.ExtendedState;
-
 import com.synectiks.commons.constants.IConsts;
 import com.synectiks.commons.utils.IUtils;
 import com.synectiks.state.machine.managers.SSMManager;
@@ -13,8 +11,6 @@ import com.synectiks.state.machine.managers.SSMManager;
  * @author Rajesh
  */
 public interface ICloudUtils {
-
-	String OAK_ROOT = "/Synectiks";
 
 	/**
 	 * Method add key, value into extended state
@@ -41,28 +37,6 @@ public interface ICloudUtils {
 	static void addSubscriptionId(SSMManager ssmManager, String ssmId) {
 		addExtendedVariable(ssmManager, ssmId, IConsts.SUBSCRIPTION_ID,
 				IUtils.extractSubscriptionId(ssmId));
-	}
-
-	/**
-	 * Method to crate jcr node path
-	 * @param exStates
-	 * @param addEvent
-	 * @return
-	 */
-	static String getNodePath(ExtendedState exStates, boolean addEvent) {
-		StringBuilder sb = new StringBuilder();
-		if (!IUtils.isNull(exStates)) {
-			sb.append(OAK_ROOT);
-			String val = exStates.get(IConsts.USERNAME, String.class);
-			sb.append(IUtils.isNullOrEmpty(val) ? "" : "/" + val);
-			val = exStates.get(IConsts.SUBSCRIPTION_ID, String.class);
-			sb.append(IUtils.isNullOrEmpty(val) ? "" : "/" + val);
-			if (addEvent) {
-				val = exStates.get(IConsts.EVENT, String.class);
-				sb.append(IUtils.isNullOrEmpty(val) ? "" : "/" + val);
-			}
-		}
-		return sb.toString();
 	}
 
 }
