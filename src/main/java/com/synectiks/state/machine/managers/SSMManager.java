@@ -16,11 +16,11 @@ import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.access.StateMachineAccess;
 import org.springframework.statemachine.access.StateMachineFunction;
-import org.springframework.statemachine.config.StateMachineFactory;
 import org.springframework.statemachine.persist.StateMachinePersister;
 import org.springframework.stereotype.Component;
 
 import com.synectiks.commons.utils.IUtils;
+import com.synectiks.state.machine.config.SynectiksStateMachineConfig;
 import com.synectiks.state.machine.listeners.SSMInterceptor;
 
 /**
@@ -32,7 +32,7 @@ public class SSMManager {
 	private static Logger logger = LoggerFactory.getLogger(SSMManager.class);
 
 	@Autowired
-	private StateMachineFactory<String, String> smFactory;
+	private SynectiksStateMachineConfig ssmConfig;
 	@Autowired
 	private StateMachinePersister<String, String, String> smPersister;
 
@@ -76,7 +76,7 @@ public class SSMManager {
 		StateMachine<String, String> machine = machines.get(machineId);
 		try {
 			if (IUtils.isNull(machine)) {
-				machine = smFactory.getStateMachine(machineId);
+				machine = ssmConfig.buildStateMachine(machineId);
 				if (!IUtils.isNull(machine)) {
 					if (machine instanceof BeanNameAware) {
 						((BeanNameAware) machine).setBeanName(machineId);

@@ -9,16 +9,19 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.SyncTaskExecutor;
+import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
+import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.StateMachineContext;
 import org.springframework.statemachine.StateMachinePersist;
-import org.springframework.statemachine.config.EnableStateMachineFactory;
-import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
-import org.springframework.statemachine.config.builders.StateMachineConfigurationConfigurer;
-import org.springframework.statemachine.config.builders.StateMachineStateConfigurer;
-import org.springframework.statemachine.config.builders.StateMachineTransitionConfigurer;
+import org.springframework.statemachine.StateMachineSystemConstants;
+import org.springframework.statemachine.config.StateMachineBuilder;
+import org.springframework.statemachine.config.StateMachineBuilder.Builder;
 import org.springframework.statemachine.config.configurers.ExternalTransitionConfigurer;
 import org.springframework.statemachine.config.configurers.StateConfigurer;
 import org.springframework.statemachine.persist.DefaultStateMachinePersister;
@@ -35,9 +38,7 @@ import com.synectiks.state.machine.repositories.SSMStateRepository;
  * @author Rajesh
  */
 @Configuration
-@EnableStateMachineFactory
-public class SynectiksStateMachineConfig
-		extends StateMachineConfigurerAdapter<String, String> {
+public class SynectiksStateMachineConfig {
 
 	private static Logger logger = LoggerFactory
 			.getLogger(SynectiksStateMachineConfig.class);
@@ -45,22 +46,38 @@ public class SynectiksStateMachineConfig
 	@Autowired
 	private SSMStateRepository stateRepository;
 
-	@Override
-	public void configure(StateMachineConfigurationConfigurer<String, String> config)
-			throws Exception {
-		logger.info("StateMachine config: 3, StateMachineConfigurationConfigurer");
-		config.withConfiguration()
-				.autoStartup(true)
-				.listener(new SSMListener());
+	@Bean
+	public BeanFactory beanFactory() {
+		StaticListableBeanFactory beanFactory = new StaticListableBeanFactory();
+		beanFactory.addBean(StateMachineSystemConstants.TASK_EXECUTOR_BEAN_NAME,
+				new SyncTaskExecutor());
+		beanFactory.addBean("taskScheduler", new ConcurrentTaskScheduler());
+		logger.info("BeanFactory created");
+		return beanFactory;
 	}
 
-	@Override
-	public void configure(StateMachineStateConfigurer<String, String> states)
+	public StateMachine<String, String> buildStateMachine(String machineId) throws Exception {
+		Builder<String, String> builder = StateMachineBuilder.builder();
+		setConfiguration(builder, machineId);
+		setStates(builder);
+		setTransitions(builder);
+		logger.info("Machine builded");
+		return builder.build();
+	}
+
+	private void setConfiguration(Builder<String, String> builder, String machineId)
 			throws Exception {
-		logger.info("StateMachine config: 4, StateMachineStateConfigurer");
+		builder.configureConfiguration().withConfiguration()
+				.autoStartup(true)
+				.listener(new SSMListener()).machineId(machineId)
+				.beanFactory(beanFactory());
+	}
+
+	private void setStates(Builder<String, String> builder) throws Exception {
+		StateConfigurer<String, String> withStates = builder.configureStates()
+				.withStates();
 		// load all states
 		Iterable<SSMState> ssmStates = stateRepository.findAll();
-		StateConfigurer<String, String> withStates = states.withStates();
 		if (!IUtils.isNull(ssmStates) && ssmStates.iterator().hasNext()) {
 			for (SSMState state : ssmStates) {
 				SSMState parent = getParent(state.getParent());
@@ -70,10 +87,11 @@ public class SynectiksStateMachineConfig
 						withStates.end(state.getName());
 					} else {
 						logger.info("initial: " + state);
-						withStates.initial(state.getName(),
-								SSMAction.build(state.getAction(),
-										state.getName(), state.getEvent()))
-						.states(getStates(ssmStates));
+						withStates
+								.initial(state.getName(),
+										SSMAction.build(state.getAction(),
+												state.getName(), state.getEvent()))
+								.states(getStates(ssmStates));
 					}
 				} else {
 					if (state.isEnd()) {
@@ -82,21 +100,14 @@ public class SynectiksStateMachineConfig
 					}
 				}
 			}
-		} else {
-			logger.error("No defined states found in repository.");
-			withStates.initial("Start");
-			withStates.end("End");
 		}
 	}
 
-	@Override
-	public void configure(StateMachineTransitionConfigurer<String, String> transitions)
-			throws Exception {
-		logger.info("StateMachine config: 5, StateMachineTransitionConfigurer");
+	private void setTransitions(Builder<String, String> builder) throws Exception {
+		ExternalTransitionConfigurer<String, String> withTrans = builder
+				.configureTransitions().withExternal();
 		// load all states
 		Iterable<SSMState> ssmStates = stateRepository.findAll();
-		ExternalTransitionConfigurer<String, String> withTrans = transitions
-				.withExternal();
 		boolean bFirst = true;
 		if (!IUtils.isNull(ssmStates) && ssmStates.iterator().hasNext()) {
 			// Set state transitions
@@ -115,23 +126,17 @@ public class SynectiksStateMachineConfig
 					withTrans.event(state.getEvent());
 				}
 				if (!IUtils.isNull(state.getAction())) {
-					withTrans.action(SSMAction.build(state.getAction(),
-							state.getName(), state.getEvent()));
+					withTrans.action(SSMAction.build(state.getAction(), state.getName(),
+							state.getEvent()));
 				}
 				if (!IUtils.isNull(state.getGuard())) {
-					withTrans.guard(SSMGuard.build(state.getGuard(),
-							state.getName(), state.getEvent()));
+					withTrans.guard(SSMGuard.build(state.getGuard(), state.getName(),
+							state.getEvent()));
 				}
 				if (!IUtils.isNull(state.getGuardExpress())) {
 					withTrans.guardExpression(state.getGuardExpress());
 				}
 			}
-		} else {
-			logger.error("No defined states found in repository.");
-			withTrans.source("Start")
-				.event("Start")
-				.action(SSMAction.build("com.synectiks.state.machine.SSMAction", "Start", "Start"))
-				.target("End");
 		}
 	}
 
@@ -157,7 +162,8 @@ public class SynectiksStateMachineConfig
 
 	@Bean
 	public StateMachinePersister<String, String, String> stateMachinePersister() {
-		return new DefaultStateMachinePersister<String, String, String>(stateMachinePersist());
+		return new DefaultStateMachinePersister<String, String, String>(
+				stateMachinePersist());
 	}
 
 	@Bean
