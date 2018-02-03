@@ -62,15 +62,6 @@ public class SSMManager {
 		return curState;
 	}
 
-	public String getMachineID(String user, String id) {
-		if (!IUtils.isNullOrEmpty(id)) {
-			if (id.contains(":")) {
-				return id;
-			}
-		}
-		return user + ":" + id;
-	}
-
 	public StateMachine<String, String> getStateMachine(String machineId)
 			throws Exception {
 		StateMachine<String, String> machine = machines.get(machineId);

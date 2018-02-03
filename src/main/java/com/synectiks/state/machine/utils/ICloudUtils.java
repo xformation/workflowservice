@@ -13,6 +13,35 @@ import com.synectiks.state.machine.managers.SSMManager;
 public interface ICloudUtils {
 
 	/**
+	 * Method returns ssmId from machine id
+	 * @param machineId
+	 * @return
+	 */
+	static String getSsmID(String machineId) {
+		if (!IUtils.isNullOrEmpty(machineId)) {
+			if (machineId.contains(":")) {
+				return machineId.substring(machineId.indexOf(":") + 1);
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Method to create a machine id with user and ssmId
+	 * @param user
+	 * @param id
+	 * @return
+	 */
+	static String getMachineID(String user, String id) {
+		if (!IUtils.isNullOrEmpty(id)) {
+			if (id.contains(":")) {
+				return id;
+			}
+		}
+		return user + ":" + id;
+	}
+
+	/**
 	 * Method add key, value into extended state
 	 * @param ssmManager
 	 * @param ssmId 

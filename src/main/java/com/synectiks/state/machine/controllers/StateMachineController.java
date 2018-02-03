@@ -29,6 +29,7 @@ import com.synectiks.commons.interfaces.IApiController;
 import com.synectiks.commons.utils.IUtils;
 import com.synectiks.state.machine.managers.SSMManager;
 import com.synectiks.state.machine.repositories.SSMStateRepository;
+import com.synectiks.state.machine.utils.ICloudUtils;
 
 /**
  * @author Rajesh
@@ -153,7 +154,7 @@ public class StateMachineController implements IApiController {
 			HttpServletRequest request) {
 		String ssmId = null;
 		try {
-			ssmId = ssmManager.getMachineID(IUtils.getUserFromRequest(request), id);
+			ssmId = ICloudUtils.getMachineID(IUtils.getUserFromRequest(request), id);
 		} catch (Throwable th) {
 			logger.error(th.getMessage(), th);
 			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)

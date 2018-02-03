@@ -33,6 +33,7 @@ import com.synectiks.state.machine.SSMAction;
 import com.synectiks.state.machine.SSMGuard;
 import com.synectiks.state.machine.listeners.SSMListener;
 import com.synectiks.state.machine.repositories.SSMStateRepository;
+import com.synectiks.state.machine.utils.ICloudUtils;
 
 /**
  * @author Rajesh
@@ -56,11 +57,18 @@ public class SynectiksStateMachineConfig {
 		return beanFactory;
 	}
 
+	private Iterable<SSMState> loadMachineStates(String machineId) {
+		Iterable<SSMState> ssmStates = stateRepository.findBySsmId(
+				ICloudUtils.getSsmID(machineId));
+		return ssmStates;
+	}
+
 	public StateMachine<String, String> buildStateMachine(String machineId) throws Exception {
 		Builder<String, String> builder = StateMachineBuilder.builder();
 		setConfiguration(builder, machineId);
-		setStates(builder);
-		setTransitions(builder);
+		Iterable<SSMState> ssmStates = loadMachineStates(machineId);
+		setStates(builder, ssmStates);
+		setTransitions(builder, ssmStates);
 		logger.info("Machine builded");
 		return builder.build();
 	}
@@ -73,11 +81,9 @@ public class SynectiksStateMachineConfig {
 				.beanFactory(beanFactory());
 	}
 
-	private void setStates(Builder<String, String> builder) throws Exception {
+	private void setStates(Builder<String, String> builder, Iterable<SSMState> ssmStates) throws Exception {
 		StateConfigurer<String, String> withStates = builder.configureStates()
 				.withStates();
-		// load all states
-		Iterable<SSMState> ssmStates = stateRepository.findAll();
 		if (!IUtils.isNull(ssmStates) && ssmStates.iterator().hasNext()) {
 			for (SSMState state : ssmStates) {
 				SSMState parent = getParent(state.getParent());
@@ -103,11 +109,9 @@ public class SynectiksStateMachineConfig {
 		}
 	}
 
-	private void setTransitions(Builder<String, String> builder) throws Exception {
+	private void setTransitions(Builder<String, String> builder, Iterable<SSMState> ssmStates) throws Exception {
 		ExternalTransitionConfigurer<String, String> withTrans = builder
 				.configureTransitions().withExternal();
-		// load all states
-		Iterable<SSMState> ssmStates = stateRepository.findAll();
 		boolean bFirst = true;
 		if (!IUtils.isNull(ssmStates) && ssmStates.iterator().hasNext()) {
 			// Set state transitions

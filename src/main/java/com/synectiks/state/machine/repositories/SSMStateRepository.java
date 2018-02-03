@@ -29,6 +29,11 @@ public class SSMStateRepository extends DynamoDbRepository<SSMState, String> {
 		return null;
 	}
 
+	public Iterable<SSMState> findBySsmId(String id) {
+		Iterable<SSMState> states = super.findByKeyValue(IDBConsts.Col_SSMID, id);
+		return states;
+	}
+
 	public Iterable<SSMState> findByParent(String parent) {
 		Iterable<SSMState> states = super.findByKeyValue(IDBConsts.Col_PARENT, parent);
 		return states;
