@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.synectiks.commons.constants.IConsts;
 import com.synectiks.commons.constants.IDBConsts;
 import com.synectiks.commons.entities.SSMState;
+import com.synectiks.commons.entities.SSMState.StatesWrapper;
 import com.synectiks.commons.interfaces.IApiController;
 import com.synectiks.commons.utils.IUtils;
 import com.synectiks.state.machine.managers.SSMManager;
@@ -77,6 +78,24 @@ public class StateMachineController implements IApiController {
 					.body(IUtils.getFailedResponse(th.getMessage()));
 		}
 		return ResponseEntity.status(HttpStatus.CREATED).body(entity);
+	}
+
+	@RequestMapping(IConsts.API_CREATE + "ByJson")
+	public ResponseEntity<Object> createByJson(@RequestBody ObjectNode states,
+			HttpServletRequest request) {
+		StatesWrapper entities = null;
+		try {
+			String user = IUtils.getUserFromRequest(request);
+			entities = IUtils.createEntity(states, user, StatesWrapper.class);
+			for (SSMState entity : entities.getStates()) {
+				entity = repository.save(entity);
+			}
+			return ResponseEntity.status(HttpStatus.CREATED).body(entities.getStates());
+		} catch (Throwable th) {
+			logger.error(th.getMessage(), th);
+			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)
+					.body(IUtils.getFailedResponse(th.getMessage()));
+		}
 	}
 
 	@Override
