@@ -63,6 +63,21 @@ public class StateMachineController implements IApiController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(entities);
 	}
 
+	/**
+	 * @param states json state obect in format:
+	 * 	{
+	 * 		"ssmId": "CloudMigration",
+	 * 		"name": "",
+	 * 		"parent": "",
+	 * 		"target": "",
+	 * 		"event": "",
+	 * 		"action": "CLASS",
+	 * 		"guard": "CLASS",
+	 * 		"guardExpress": "",
+	 * 		"initial": "true/false",
+	 * 		"end": "true/false"
+	 * 	}
+	 */
 	@Override
 	@RequestMapping(IConsts.API_CREATE)
 	public ResponseEntity<Object> create(@RequestBody ObjectNode states,
@@ -80,6 +95,41 @@ public class StateMachineController implements IApiController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(entity);
 	}
 
+	/**
+	 * /createByJson api to create state object by json in format:
+	 * @param states states json object
+	 * <pre>
+	 * {
+	 * 	"states"=[
+	 * 		{
+	 * 			"ssmId": "CloudMigration",
+	 * 			"name": "",
+	 * 			"parent": "",
+	 * 			"target": "",
+	 * 			"event": "",
+	 * 			"action": "CLASS",
+	 * 			"guard": "CLASS",
+	 * 			"guardExpress": "",
+	 * 			"initial": "true/false",
+	 * 			"end": "true/false"
+	 * 		},
+	 * 		{
+	 * 			"ssmId": "CloudMigration",
+	 * 			"name": "",
+	 * 			"parent": "",
+	 * 			"target": "",
+	 * 			"event": "",
+	 * 			"action": "CLASS",
+	 * 			"guard": "CLASS",
+	 * 			"guardExpress": "",
+	 * 			"initial": "true/false",
+	 * 			"end": "true/false"
+	 * 		}, ...
+	 * 	]
+	 * </pre>
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping(IConsts.API_CREATE + "ByJson")
 	public ResponseEntity<Object> createByJson(@RequestBody ObjectNode states,
 			HttpServletRequest request) {
