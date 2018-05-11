@@ -20,7 +20,7 @@ public interface ICloudUtils {
 	static String getSsmID(String machineId) {
 		if (!IUtils.isNullOrEmpty(machineId)) {
 			if (machineId.contains(":")) {
-				return machineId.substring(machineId.indexOf(":") + 1);
+				return machineId.substring(0, machineId.indexOf(":"));
 			}
 		}
 		return null;
