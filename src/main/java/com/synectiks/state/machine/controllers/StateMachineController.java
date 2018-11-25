@@ -153,7 +153,7 @@ public class StateMachineController implements IApiController {
 	public ResponseEntity<Object> findById(@PathVariable("id") String id) {
 		SSMState entity = null;
 		try {
-			entity = repository.findById(id);
+			entity = repository.findById(id).orElse(null);
 		} catch (Throwable th) {
 			logger.error(th.getMessage(), th);
 			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)

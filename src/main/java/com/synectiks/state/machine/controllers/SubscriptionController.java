@@ -61,7 +61,7 @@ public class SubscriptionController implements IApiController {
 	public ResponseEntity<Object> findById(@PathVariable("id") String id) {
 		Subscription entity = null;
 		try {
-			entity = repository.findById(id);
+			entity = repository.findById(id).orElse(null);
 		} catch (Throwable th) {
 			logger.error(th.getMessage(), th);
 			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)
