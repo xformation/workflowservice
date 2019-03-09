@@ -85,7 +85,7 @@ public class SubscriptionController implements IApiController {
 	}
 
 	@Override
-	@RequestMapping(path = "/")
+	@RequestMapping(IConsts.API_CREATE)
 	public ResponseEntity<Object> create(@RequestBody ObjectNode entity,
 			HttpServletRequest request) {
 		Subscription subs = null;

@@ -202,6 +202,12 @@ public class StateMachineController implements IApiController {
 				.body(IUtils.getFailedResponse("Not a valid entity"));
 	}
 
+	/**
+	 * API to get all states of statemachne by id
+	 * @param id
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping(path = IConsts.API_MACHINE_STATES, method = RequestMethod.GET)
 	public ResponseEntity<Object> listStates(
 			@RequestParam(name = IConsts.PRM_MACHINE_ID) String id,
@@ -217,6 +223,12 @@ public class StateMachineController implements IApiController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(entities);
 	}
 
+	/**
+	 * API to get the machine id from a string state machine name
+	 * @param id
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping(path = IConsts.API_MACHINE_ID, method = RequestMethod.GET)
 	public ResponseEntity<Object> getMachineId(
 			@RequestParam(name = IConsts.PRM_MACHINE_ID) String id,
@@ -232,6 +244,14 @@ public class StateMachineController implements IApiController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(ssmId);
 	}
 
+	/**
+	 * API to set extended variable into statemachine
+	 * @param id
+	 * @param key
+	 * @param cls
+	 * @param val
+	 * @return
+	 */
 	@RequestMapping(path = IConsts.API_ADD_EXT_VAR)
 	public ResponseEntity<Object> addExtendedVariable(
 			@RequestParam(name = IConsts.PRM_MACHINE_ID) String id,
@@ -261,6 +281,13 @@ public class StateMachineController implements IApiController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(bRes);
 	}
 
+	/**
+	 * API to send event to satate machine
+	 * @param id
+	 * @param event
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping(path = IConsts.API_MACHINE_EVENT)
 	public ResponseEntity<Object> sendEvent(
 			@RequestParam(name = IConsts.PRM_MACHINE_ID) String id,
@@ -279,6 +306,12 @@ public class StateMachineController implements IApiController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(bRes);
 	}
 
+	/**
+	 * API to get current state of statemachine
+	 * @param id
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping(path = IConsts.API_MACHINE_STATE)
 	public ResponseEntity<Object> getCurrentState(
 			@RequestParam(name = IConsts.PRM_MACHINE_ID) String id,
