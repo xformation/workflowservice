@@ -49,6 +49,19 @@ public class StateMachineController implements IApiController {
 	@Autowired
 	private SSMManager ssmManager;
 
+	@RequestMapping(path = "listBySsmId", method = RequestMethod.GET)
+	public ResponseEntity<Object> listBySsmId(@RequestParam String ssmId) {
+		List<SSMState> entities = null;
+		try {
+			entities = (List<SSMState>) repository.findBySsmId(ssmId);
+		} catch (Throwable th) {
+			logger.error(th.getMessage(), th);
+			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)
+					.body(IUtils.getFailedResponse(th.getMessage()));
+		}
+		return ResponseEntity.status(HttpStatus.OK).body(entities);
+	}
+
 	@Override
 	@RequestMapping(path = IConsts.API_FIND_ALL, method = RequestMethod.GET)
 	public ResponseEntity<Object> findAll(HttpServletRequest request) {
