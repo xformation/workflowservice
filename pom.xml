@@ -10,7 +10,7 @@
 	</parent>
 
 	<properties>
-		<statemachine.version>1.2.0.RELEASE</statemachine.version>
+		<statemachine.version>1.2.14.RELEASE</statemachine.version>
 	</properties>
 
 	<artifactId>workflowservice</artifactId>

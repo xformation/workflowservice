@@ -60,7 +60,7 @@ public class StateMachineController implements IApiController {
 			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)
 					.body(IUtils.getFailedResponse(th.getMessage()));
 		}
-		return ResponseEntity.status(HttpStatus.CREATED).body(entities);
+		return ResponseEntity.status(HttpStatus.OK).body(entities);
 	}
 
 	/**
@@ -100,7 +100,7 @@ public class StateMachineController implements IApiController {
 	 * @param states states json object
 	 * <pre>
 	 * {
-	 * 	"states"=[
+	 * 	"states": [
 	 * 		{
 	 * 			"ssmId": "CloudMigration",
 	 * 			"name": "",
@@ -126,6 +126,7 @@ public class StateMachineController implements IApiController {
 	 * 			"end": "true/false"
 	 * 		}, ...
 	 * 	]
+	 * }
 	 * </pre>
 	 * @param request
 	 * @return
