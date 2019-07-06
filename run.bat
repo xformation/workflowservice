@@ -1,0 +1,1 @@
+java -jar target\workflowservice-2.0.0-SNAPSHOT-exec.jar --SERVER_PORT=8095 --AWS_ENDPOINT=localhost:8000/eu_west_1

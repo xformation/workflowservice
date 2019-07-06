@@ -234,7 +234,7 @@ public class StateMachineController implements IApiController {
 			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)
 					.body(IUtils.getFailedResponse(th.getMessage()));
 		}
-		return ResponseEntity.status(HttpStatus.CREATED).body(entities);
+		return ResponseEntity.status(HttpStatus.OK).body(entities);
 	}
 
 	/**
@@ -255,7 +255,7 @@ public class StateMachineController implements IApiController {
 			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)
 					.body(IUtils.getFailedResponse(th.getMessage()));
 		}
-		return ResponseEntity.status(HttpStatus.CREATED).body(ssmId);
+		return ResponseEntity.status(HttpStatus.OK).body(ssmId);
 	}
 
 	/**
@@ -292,7 +292,7 @@ public class StateMachineController implements IApiController {
 			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)
 					.body(IUtils.getFailedResponse(th.getMessage()));
 		}
-		return ResponseEntity.status(HttpStatus.CREATED).body(bRes);
+		return ResponseEntity.status(HttpStatus.OK).body(bRes);
 	}
 
 	/**
@@ -317,7 +317,7 @@ public class StateMachineController implements IApiController {
 			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)
 					.body(IUtils.getFailedResponse(th.getMessage()));
 		}
-		return ResponseEntity.status(HttpStatus.CREATED).body(bRes);
+		return ResponseEntity.status(HttpStatus.OK).body(bRes);
 	}
 
 	/**
@@ -338,7 +338,7 @@ public class StateMachineController implements IApiController {
 			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)
 					.body(IUtils.getFailedResponse(th.getMessage()));
 		}
-		return ResponseEntity.status(HttpStatus.CREATED).body(curState);
+		return ResponseEntity.status(HttpStatus.OK).body(curState);
 	}
 
 }

@@ -24,6 +24,7 @@ import org.springframework.statemachine.config.StateMachineBuilder;
 import org.springframework.statemachine.config.StateMachineBuilder.Builder;
 import org.springframework.statemachine.config.configurers.ExternalTransitionConfigurer;
 import org.springframework.statemachine.config.configurers.StateConfigurer;
+//import org.springframework.statemachine.data.jpa.JpaStateMachineRepository;
 import org.springframework.statemachine.persist.DefaultStateMachinePersister;
 import org.springframework.statemachine.persist.StateMachinePersister;
 
@@ -46,6 +47,8 @@ public class SynectiksStateMachineConfig {
 
 	@Autowired
 	private SSMStateRepository stateRepository;
+	//@Autowired
+	//private JpaStateMachineRepository jpaStateMachineRepository;
 
 	@Bean
 	public BeanFactory beanFactory() {
@@ -58,12 +61,13 @@ public class SynectiksStateMachineConfig {
 	}
 
 	private Iterable<SSMState> loadMachineStates(String machineId) {
-		Iterable<SSMState> ssmStates = stateRepository.findBySsmId(
-				ICloudUtils.getSsmID(machineId));
+		Iterable<SSMState> ssmStates = stateRepository
+				.findBySsmId(ICloudUtils.getSsmID(machineId));
 		return ssmStates;
 	}
 
-	public StateMachine<String, String> buildStateMachine(String machineId) throws Exception {
+	public StateMachine<String, String> buildStateMachine(String machineId)
+			throws Exception {
 		Builder<String, String> builder = StateMachineBuilder.builder();
 		setConfiguration(builder, machineId);
 		Iterable<SSMState> ssmStates = loadMachineStates(machineId);
@@ -75,13 +79,13 @@ public class SynectiksStateMachineConfig {
 
 	private void setConfiguration(Builder<String, String> builder, String machineId)
 			throws Exception {
-		builder.configureConfiguration().withConfiguration()
-				.autoStartup(true)
+		builder.configureConfiguration().withConfiguration().autoStartup(true)
 				.listener(new SSMListener()).machineId(machineId)
 				.beanFactory(beanFactory());
 	}
 
-	private void setStates(Builder<String, String> builder, Iterable<SSMState> ssmStates) throws Exception {
+	private void setStates(Builder<String, String> builder, Iterable<SSMState> ssmStates)
+			throws Exception {
 		StateConfigurer<String, String> withStates = builder.configureStates()
 				.withStates();
 		if (!IUtils.isNull(ssmStates) && ssmStates.iterator().hasNext()) {
@@ -91,7 +95,7 @@ public class SynectiksStateMachineConfig {
 					if (state.isEnd()) {
 						logger.info("End: " + state);
 						withStates.end(state.getName());
-					} else {
+					} else if (state.isInitial()) {
 						logger.info("initial: " + state);
 						withStates
 								.initial(state.getName(),
@@ -109,7 +113,8 @@ public class SynectiksStateMachineConfig {
 		}
 	}
 
-	private void setTransitions(Builder<String, String> builder, Iterable<SSMState> ssmStates) throws Exception {
+	private void setTransitions(Builder<String, String> builder,
+			Iterable<SSMState> ssmStates) throws Exception {
 		ExternalTransitionConfigurer<String, String> withTrans = builder
 				.configureTransitions().withExternal();
 		boolean bFirst = true;
@@ -172,6 +177,7 @@ public class SynectiksStateMachineConfig {
 
 	@Bean
 	public StateMachinePersist<String, String, String> stateMachinePersist() {
+
 		final HashMap<String, StateMachineContext<String, String>> contexts = new HashMap<>();
 		return new StateMachinePersist<String, String, String>() {
 
@@ -187,5 +193,8 @@ public class SynectiksStateMachineConfig {
 				return contexts.get(contextObj);
 			}
 		};
+
+		// return new
+		// JpaPersistingStateMachineInterceptor<>(jpaStateMachineRepository);
 	}
 }
