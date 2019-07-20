@@ -326,7 +326,7 @@ public class StateMachineController implements IApiController {
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(path = IConsts.API_MACHINE_STATE)
+	@RequestMapping(path = IConsts.API_MACHINE_STATE, method = RequestMethod.GET)
 	public ResponseEntity<Object> getCurrentState(
 			@RequestParam(name = IConsts.PRM_MACHINE_ID) String id,
 			HttpServletRequest request) {

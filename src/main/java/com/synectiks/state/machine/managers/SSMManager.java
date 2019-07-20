@@ -69,6 +69,9 @@ public class SSMManager {
 			if (IUtils.isNull(machine)) {
 				machine = ssmConfig.buildStateMachine(machineId);
 				if (!IUtils.isNull(machine)) {
+					// restore state from persistence
+					machine = smPersister.restore(machine, machineId);
+					// configure it with setting other options
 					if (machine instanceof BeanNameAware) {
 						((BeanNameAware) machine).setBeanName(machineId);
 					}

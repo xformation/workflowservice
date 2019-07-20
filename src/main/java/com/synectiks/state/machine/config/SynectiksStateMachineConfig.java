@@ -3,7 +3,6 @@
  */
 package com.synectiks.state.machine.config;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,17 +23,19 @@ import org.springframework.statemachine.config.StateMachineBuilder;
 import org.springframework.statemachine.config.StateMachineBuilder.Builder;
 import org.springframework.statemachine.config.configurers.ExternalTransitionConfigurer;
 import org.springframework.statemachine.config.configurers.StateConfigurer;
-//import org.springframework.statemachine.data.jpa.JpaStateMachineRepository;
 import org.springframework.statemachine.persist.DefaultStateMachinePersister;
 import org.springframework.statemachine.persist.StateMachinePersister;
 
 import com.synectiks.commons.entities.SSMState;
+import com.synectiks.commons.entities.SSMachine;
 import com.synectiks.commons.utils.IUtils;
 import com.synectiks.state.machine.SSMAction;
 import com.synectiks.state.machine.SSMGuard;
 import com.synectiks.state.machine.listeners.SSMListener;
+import com.synectiks.state.machine.repositories.SSMRepository;
 import com.synectiks.state.machine.repositories.SSMStateRepository;
 import com.synectiks.state.machine.utils.ICloudUtils;
+import com.synectiks.state.machine.utils.StateMachineContextConverter;
 
 /**
  * @author Rajesh
@@ -44,11 +45,12 @@ public class SynectiksStateMachineConfig {
 
 	private static Logger logger = LoggerFactory
 			.getLogger(SynectiksStateMachineConfig.class);
+	private static StateMachineContextConverter converter = new StateMachineContextConverter();
 
 	@Autowired
 	private SSMStateRepository stateRepository;
-	//@Autowired
-	//private JpaStateMachineRepository jpaStateMachineRepository;
+	@Autowired
+	private SSMRepository ssmRepository;
 
 	@Bean
 	public BeanFactory beanFactory() {
@@ -178,23 +180,31 @@ public class SynectiksStateMachineConfig {
 	@Bean
 	public StateMachinePersist<String, String, String> stateMachinePersist() {
 
-		final HashMap<String, StateMachineContext<String, String>> contexts = new HashMap<>();
 		return new StateMachinePersist<String, String, String>() {
 
 			@Override
 			public void write(StateMachineContext<String, String> context,
 					String contextObj) throws Exception {
-				contexts.put(contextObj, context);
+				SSMachine machine = ssmRepository.findBySsmId(contextObj);
+				if (IUtils.isNull(machine)) {
+					machine = new SSMachine();
+					machine.setSsmId(contextObj);
+				}
+				machine.setSsmContext(converter.convertToDatabaseColumn(context));
+				logger.info("SSMachine: ", machine);
+				ssmRepository.save(machine);
 			}
 
+			@SuppressWarnings("unchecked")
 			@Override
 			public StateMachineContext<String, String> read(String contextObj)
 					throws Exception {
-				return contexts.get(contextObj);
+				SSMachine machine = ssmRepository.findBySsmId(contextObj);
+				if (!IUtils.isNull(machine) && !IUtils.isNullOrEmpty(machine.getSsmContext())) {
+					return converter.convertToEntityAttribute(machine.getSsmContext());
+				}
+				return null;
 			}
 		};
-
-		// return new
-		// JpaPersistingStateMachineInterceptor<>(jpaStateMachineRepository);
 	}
 }
