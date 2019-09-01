@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.origin.OriginTrackedValue;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
@@ -17,12 +18,14 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.env.MapPropertySource;
 
 import com.synectiks.commons.utils.IUtils;
+import com.synectiks.state.machine.config.ApplicationProperties;
 
 /**
  * @author Rajesh
  */
 @SpringBootApplication
 @ComponentScan("com.synectiks")
+@EnableConfigurationProperties({ApplicationProperties.class})
 public class SynectiksSSMApplication {
 
 	private static final Logger logger = LoggerFactory

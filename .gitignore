@@ -25,4 +25,7 @@ nbdist/
 .mvn
 oakRepo
 
-data
+data/
+node_modules/
+node/
+node
