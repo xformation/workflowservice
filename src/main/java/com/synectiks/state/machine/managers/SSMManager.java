@@ -69,8 +69,8 @@ public class SSMManager {
 			if (IUtils.isNull(machine)) {
 				machine = ssmConfig.buildStateMachine(machineId);
 				if (!IUtils.isNull(machine)) {
-					// restore state from persistence
-					machine = smPersister.restore(machine, machineId);
+					// persist state from persistence
+					//machine = smPersister.restore(machine, machineId);
 					// configure it with setting other options
 					if (machine instanceof BeanNameAware) {
 						((BeanNameAware) machine).setBeanName(machineId);
@@ -106,10 +106,15 @@ public class SSMManager {
 	}
 
 	private void persistMachine(StateMachine<String, String> machine) throws Exception {
-		// set machine into cache
-		machines.put(machine.getId(), machine);
-		// persist machine state
-		smPersister.persist(machine, machine.getId());
+		if (!IUtils.isNullOrEmpty(machine.getId())) {
+			// set machine into cache
+			machines.put(machine.getId(), machine);
+			logger.info("Persisting: " + machine.getId());
+			// persist machine state
+			smPersister.persist(machine, machine.getId());
+		} else {
+			logger.error("STATE MACHINE ID is NULL.");
+		}
 	}
 
 	public boolean sendEvent(String ssmId, String event) throws Exception {
