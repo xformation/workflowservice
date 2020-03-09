@@ -42,22 +42,22 @@ public class TokenProvider implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        byte[] keyBytes;
-        String secret = jHipsterProperties.getSecurity().getAuthentication().getJwt().getSecret();
-        if (!StringUtils.isEmpty(secret)) {
-            log.warn("Warning: the JWT key used is not Base64-encoded. " +
-                "We recommend using the `jhipster.security.authentication.jwt.base64-secret` key for optimum security.");
-            keyBytes = secret.getBytes(StandardCharsets.UTF_8);
-        } else {
-            log.debug("Using a Base64-encoded JWT secret key");
-            keyBytes = Decoders.BASE64.decode(jHipsterProperties.getSecurity().getAuthentication().getJwt().getBase64Secret());
-        }
-        this.key = Keys.hmacShaKeyFor(keyBytes);
-        this.tokenValidityInMilliseconds =
-            1000 * jHipsterProperties.getSecurity().getAuthentication().getJwt().getTokenValidityInSeconds();
-        this.tokenValidityInMillisecondsForRememberMe =
-            1000 * jHipsterProperties.getSecurity().getAuthentication().getJwt()
-                .getTokenValidityInSecondsForRememberMe();
+//        byte[] keyBytes;
+//        String secret = jHipsterProperties.getSecurity().getAuthentication().getJwt().getSecret();
+//        if (!StringUtils.isEmpty(secret)) {
+//            log.warn("Warning: the JWT key used is not Base64-encoded. " +
+//                "We recommend using the `jhipster.security.authentication.jwt.base64-secret` key for optimum security.");
+//            keyBytes = secret.getBytes(StandardCharsets.UTF_8);
+//        } else {
+//            log.debug("Using a Base64-encoded JWT secret key");
+//            keyBytes = Decoders.BASE64.decode(jHipsterProperties.getSecurity().getAuthentication().getJwt().getBase64Secret());
+//        }
+//        this.key = Keys.hmacShaKeyFor(keyBytes);
+//        this.tokenValidityInMilliseconds =
+//            1000 * jHipsterProperties.getSecurity().getAuthentication().getJwt().getTokenValidityInSeconds();
+//        this.tokenValidityInMillisecondsForRememberMe =
+//            1000 * jHipsterProperties.getSecurity().getAuthentication().getJwt()
+//                .getTokenValidityInSecondsForRememberMe();
     }
 
     public String createToken(Authentication authentication, boolean rememberMe) {
